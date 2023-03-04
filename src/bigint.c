@@ -476,5 +476,38 @@ int eli_bigint_create_meta(lua_State *L) {
   lua_pushcfunction(L, eli_bigint_free);
   lua_setfield(L, -2, "__gc");
 
+  /* methods under __index */
+  lua_newtable(L);
+  lua_pushcfunction(L, eli_bigint_add);
+  lua_setfield(L, -2, "add");
+  lua_pushcfunction(L, eli_bigint_sub);
+  lua_setfield(L, -2, "sub");
+  lua_pushcfunction(L, eli_bigint_mul);
+  lua_setfield(L, -2, "mul");
+  lua_pushcfunction(L, eli_bigint_div);
+  lua_setfield(L, -2, "div");
+  lua_pushcfunction(L, eli_bigint_mod);
+  lua_setfield(L, -2, "mod");
+  lua_pushcfunction(L, eli_bigint_exp);
+  lua_setfield(L, -2, "pow");
+  lua_pushcfunction(L, eli_bigint_neg);
+  lua_setfield(L, -2, "unm");
+  lua_pushcfunction(L, eli_bigint_idiv);
+  lua_setfield(L, -2, "idiv");
+  lua_pushcfunction(L, eli_bigint_eq);
+  lua_setfield(L, -2, "eq");
+  lua_pushcfunction(L, eli_bigint_lt);
+  lua_setfield(L, -2, "lt");
+  lua_pushcfunction(L, eli_bigint_le);
+  lua_setfield(L, -2, "le");
+  lua_pushcfunction(L, eli_bigint_len);
+  lua_setfield(L, -2, "len");
+  lua_pushcfunction(L, eli_bigint_tostring);
+  lua_setfield(L, -2, "tostring");
+  lua_pushstring(L, ELI_BIGINT_METATABLE);
+  lua_setfield(L, -2, "__type");
+
+  lua_setfield(L, -2, "__index");
+
   return 1;
 }
