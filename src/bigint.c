@@ -253,12 +253,22 @@ int eli_bigint_neg(lua_State *L) {
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
   }
+
   mbedtls_mpi *bi2 = new_eli_bigint(L);
   if (bi2 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
+  int res = mbedtls_mpi_lset(bi2, -1);
+  if (res != 0) {
+    return luaL_error(L, "error setting bigint: %d", res);
+  }
 
-  int res = mbedtls_mpi_mul_int(bi2, bi1, -1);
+  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  if (bi3 == NULL) {
+    return luaL_error(L, "error creating bigint");
+  }
+
+  res = mbedtls_mpi_mul_mpi(bi3, bi1, bi2);
   if (res != 0) {
     return luaL_error(L, "error negating bigint: %d", res);
   }
