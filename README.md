@@ -1,3 +1,3 @@
-## eli-lib bigint
+## lua-mbed-bigint
 
-Lua bindings to mbedtls bignum library exposed as bigint.
+Lua bindings to mbedtls providing bigint capabilities.

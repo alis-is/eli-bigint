@@ -10,11 +10,11 @@
 /*
  * internal function to create a new bigint userdata on the stack and return it.
  */
-mbedtls_mpi *new_eli_bigint(lua_State *L) {
+mbedtls_mpi *new_l_mbed_bigint(lua_State *L) {
   mbedtls_mpi *bi = (mbedtls_mpi *)lua_newuserdatauv(L, sizeof(mbedtls_mpi), 0);
   if (bi) {
     mbedtls_mpi_init(bi);
-    luaL_getmetatable(L, ELI_BIGINT_METATABLE);
+    luaL_getmetatable(L, LUA_MBED_BIGINT_METATABLE);
     lua_setmetatable(L, -2);
   }
   return bi;
@@ -39,7 +39,7 @@ mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
         return NULL;
       }
     }
-    mbedtls_mpi *bi = new_eli_bigint(L);
+    mbedtls_mpi *bi = new_l_mbed_bigint(L);
     int res = mbedtls_mpi_lset(bi, n);
     if (res != 0) {
       luaL_error(L, "error setting bigint value: %d", res);
@@ -48,7 +48,7 @@ mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
     return bi;
   }
   case LUA_TSTRING: {
-    mbedtls_mpi *bi = new_eli_bigint(L);
+    mbedtls_mpi *bi = new_l_mbed_bigint(L);
     int res = mbedtls_mpi_read_string(bi, 10, lua_tostring(L, index));
     if (res != 0) {
       luaL_error(L, "error setting bigint value: %d", res);
@@ -57,7 +57,7 @@ mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
     return bi;
   }
   case LUA_TUSERDATA:
-    return (mbedtls_mpi *)luaL_checkudata(L, index, ELI_BIGINT_METATABLE);
+    return (mbedtls_mpi *)luaL_checkudata(L, index, LUA_MBED_BIGINT_METATABLE);
   default:
     return NULL;
   }
@@ -66,8 +66,8 @@ mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
 /*
  * Create a new bigint userdata on the stack and return it.
  */
-int eli_new_bigint(lua_State *L) {
-  mbedtls_mpi *bi = new_eli_bigint(L);
+int l_mbed_new_bigint(lua_State *L) {
+  mbedtls_mpi *bi = new_l_mbed_bigint(L);
 
   switch (lua_type(L, 1)) {
   case LUA_TNUMBER: {
@@ -88,7 +88,7 @@ int eli_new_bigint(lua_State *L) {
     break;
   case LUA_TUSERDATA: {
     mbedtls_mpi *bi1 =
-        (mbedtls_mpi *)luaL_checkudata(L, 1, ELI_BIGINT_METATABLE);
+        (mbedtls_mpi *)luaL_checkudata(L, 1, LUA_MBED_BIGINT_METATABLE);
     int res = mbedtls_mpi_copy(bi, bi1);
     if (res != 0) {
       return luaL_error(L, "error setting bigint value: %d", res);
@@ -101,7 +101,7 @@ int eli_new_bigint(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_add(lua_State *L) {
+int l_mbed_bigint_add(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -110,7 +110,7 @@ int eli_bigint_add(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -122,7 +122,7 @@ int eli_bigint_add(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_add_abs(lua_State *L) {
+int l_mbed_bigint_add_abs(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -131,7 +131,7 @@ int eli_bigint_add_abs(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -143,7 +143,7 @@ int eli_bigint_add_abs(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_sub(lua_State *L) {
+int l_mbed_bigint_sub(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -152,7 +152,7 @@ int eli_bigint_sub(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -164,7 +164,7 @@ int eli_bigint_sub(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_sub_abs(lua_State *L) {
+int l_mbed_bigint_sub_abs(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -173,7 +173,7 @@ int eli_bigint_sub_abs(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -185,7 +185,7 @@ int eli_bigint_sub_abs(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_mul(lua_State *L) {
+int l_mbed_bigint_mul(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -194,7 +194,7 @@ int eli_bigint_mul(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -206,7 +206,7 @@ int eli_bigint_mul(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_div(lua_State *L) {
+int l_mbed_bigint_div(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -215,7 +215,7 @@ int eli_bigint_div(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -227,7 +227,7 @@ int eli_bigint_div(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_mod(lua_State *L) {
+int l_mbed_bigint_mod(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -236,7 +236,7 @@ int eli_bigint_mod(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -248,13 +248,13 @@ int eli_bigint_mod(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_neg(lua_State *L) {
+int l_mbed_bigint_neg(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
   }
 
-  mbedtls_mpi *bi2 = new_eli_bigint(L);
+  mbedtls_mpi *bi2 = new_l_mbed_bigint(L);
   if (bi2 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -263,7 +263,7 @@ int eli_bigint_neg(lua_State *L) {
     return luaL_error(L, "error setting bigint: %d", res);
   }
 
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -275,7 +275,7 @@ int eli_bigint_neg(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_exp(lua_State *L) {
+int l_mbed_bigint_exp(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -284,7 +284,7 @@ int eli_bigint_exp(lua_State *L) {
   if (bi2 == NULL) {
     return luaL_typeerror(L, 2, "number or string or bigint");
   }
-  mbedtls_mpi *bi3 = new_eli_bigint(L);
+  mbedtls_mpi *bi3 = new_l_mbed_bigint(L);
   if (bi3 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -303,7 +303,7 @@ int eli_bigint_exp(lua_State *L) {
     return 1;
   }
 
-  mbedtls_mpi *bi4 = new_eli_bigint(L);
+  mbedtls_mpi *bi4 = new_l_mbed_bigint(L);
   if (bi4 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -326,7 +326,7 @@ int eli_bigint_exp(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_exp_mod(lua_State *L) {
+int l_mbed_bigint_exp_mod(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -344,10 +344,10 @@ int eli_bigint_exp_mod(lua_State *L) {
   case LUA_TNIL:
     break;
   default:
-    bi4 = luaL_checkudata(L, 4, ELI_BIGINT_METATABLE);
+    bi4 = luaL_checkudata(L, 4, LUA_MBED_BIGINT_METATABLE);
     break;
   }
-  mbedtls_mpi *bi5 = new_eli_bigint(L);
+  mbedtls_mpi *bi5 = new_l_mbed_bigint(L);
   if (bi5 == NULL) {
     return luaL_error(L, "error creating bigint");
   }
@@ -359,9 +359,9 @@ int eli_bigint_exp_mod(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_idiv(lua_State *L) { return eli_bigint_div(L); }
+int l_mbed_bigint_idiv(lua_State *L) { return l_mbed_bigint_div(L); }
 
-int eli_bigint_eq(lua_State *L) {
+int l_mbed_bigint_eq(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -374,7 +374,7 @@ int eli_bigint_eq(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_lt(lua_State *L) {
+int l_mbed_bigint_lt(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -387,7 +387,7 @@ int eli_bigint_lt(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_le(lua_State *L) {
+int l_mbed_bigint_le(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -400,7 +400,7 @@ int eli_bigint_le(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_len(lua_State *L) {
+int l_mbed_bigint_len(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -409,7 +409,7 @@ int eli_bigint_len(lua_State *L) {
   return 1;
 }
 
-int eli_bigint_tostring(lua_State *L) {
+int l_mbed_bigint_tostring(lua_State *L) {
   mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
   if (bi1 == NULL) {
     return luaL_typeerror(L, 1, "number or string or bigint");
@@ -433,78 +433,197 @@ int eli_bigint_tostring(lua_State *L) {
   return 2;
 }
 
-int eli_bigint_free(lua_State *L) {
-  mbedtls_mpi *bi1 = (mbedtls_mpi *)luaL_checkudata(L, 1, ELI_BIGINT_METATABLE);
+int l_mbed_bigint_tobinary(lua_State *L) {
+  mbedtls_mpi *bi = (mbedtls_mpi *)luaL_checkudata(L, 1, LUA_MBED_BIGINT_METATABLE);
+  if (bi == NULL) {
+    return luaL_typeerror(L, 1, "bigint");
+  }
+
+  size_t bufflen = mbedtls_mpi_size(bi);
+  // lua string buffer with bufflen size
+  luaL_Buffer b;
+  char *str = luaL_buffinitsize(L, &b, bufflen);
+  int res = mbedtls_mpi_write_binary(bi, (unsigned char *)str, bufflen);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_write_binary failed: %d", res);
+  }
+  luaL_pushresult(&b);
+  return 1;
+}
+
+int l_mbed_bigint_tobinary_le(lua_State *L) {
+  mbedtls_mpi *bi = (mbedtls_mpi *)luaL_checkudata(L, 1, LUA_MBED_BIGINT_METATABLE);
+  if (bi == NULL) {
+    return luaL_typeerror(L, 1, "bigint");
+  }
+
+  size_t bufflen = mbedtls_mpi_size(bi);
+  // lua string buffer with bufflen size
+  luaL_Buffer b;
+  char *str = luaL_buffinitsize(L, &b, bufflen);
+  int res = mbedtls_mpi_write_binary_le(bi, (unsigned char *)str, bufflen);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_write_binary_le failed: %d", res);
+  }
+  luaL_pushresult(&b);
+  return 1;
+}
+
+int l_mbed_bigint_frombinary(lua_State *L) {
+  size_t bufflen = 0;
+  const char *str = luaL_checklstring(L, 1, &bufflen);
+  mbedtls_mpi *bi = new_l_mbed_bigint(L);
+  if (bi == NULL) {
+    return luaL_error(L, "new_l_mbed_bigint failed");
+  }
+  int res = mbedtls_mpi_read_binary(bi, (unsigned char *)str, bufflen);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_read_binary failed: %d", res);
+  }
+  return 1;
+}
+
+int l_mbed_bigint_frombinary_le(lua_State *L) {
+  size_t bufflen = 0;
+  const char *str = luaL_checklstring(L, 1, &bufflen);
+  mbedtls_mpi *bi = new_l_mbed_bigint(L);
+  if (bi == NULL) {
+    return luaL_error(L, "new_l_mbed_bigint failed");
+  }
+  int res = mbedtls_mpi_read_binary_le(bi, (unsigned char *)str, bufflen);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_read_binary_le failed: %d", res);
+  }
+  return 1;
+}
+
+int l_mbed_bigint_shr(lua_State *L) {
+  mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
+  if (bi1 == NULL) {
+    return luaL_typeerror(L, 1, "number or string or bigint");
+  }
+  int shift = luaL_checkinteger(L, 2);
+  mbedtls_mpi *bi2 = new_l_mbed_bigint(L);
+  if (bi2 == NULL) {
+    return luaL_error(L, "new_l_mbed_bigint failed");
+  }
+  int res = mbedtls_mpi_copy(bi2, bi1);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_copy failed: %d", res);
+  }
+  res = mbedtls_mpi_shift_r(bi2, shift);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_shift_r failed: %d", res);
+  }
+  return 1;
+}
+
+int l_mbed_bigint_shl(lua_State *L) {
+  mbedtls_mpi *bi1 = stack_element_to_bigint(L, 1);
+  if (bi1 == NULL) {
+    return luaL_typeerror(L, 1, "number or string or bigint");
+  }
+  int shift = luaL_checkinteger(L, 2);
+  mbedtls_mpi *bi2 = new_l_mbed_bigint(L);
+  if (bi2 == NULL) {
+    return luaL_error(L, "new_l_mbed_bigint failed");
+  }
+  int res = mbedtls_mpi_copy(bi2, bi1);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_copy failed: %d", res);
+  }
+  res = mbedtls_mpi_shift_l(bi2, shift);
+  if (res != 0) {
+    return luaL_error(L, "mbedtls_mpi_shift_l failed: %d", res);
+  }
+  return 1;
+}
+
+int l_mbed_bigint_free(lua_State *L) {
+  mbedtls_mpi *bi1 = (mbedtls_mpi *)luaL_checkudata(L, 1, LUA_MBED_BIGINT_METATABLE);
   if (bi1 != NULL) {
     mbedtls_mpi_free(bi1);
   }
   return 0;
 }
 
-int eli_bigint_create_meta(lua_State *L) {
-  luaL_newmetatable(L, ELI_BIGINT_METATABLE);
+
+int l_mbed_bigint_create_meta(lua_State *L) {
+  luaL_newmetatable(L, LUA_MBED_BIGINT_METATABLE);
 
   /* metatable fields*/
-  lua_pushcfunction(L, eli_bigint_add);
+  lua_pushcfunction(L, l_mbed_bigint_add);
   lua_setfield(L, -2, "__add");
-  lua_pushcfunction(L, eli_bigint_sub);
+  lua_pushcfunction(L, l_mbed_bigint_sub);
   lua_setfield(L, -2, "__sub");
-  lua_pushcfunction(L, eli_bigint_mul);
+  lua_pushcfunction(L, l_mbed_bigint_mul);
   lua_setfield(L, -2, "__mul");
-  lua_pushcfunction(L, eli_bigint_div);
+  lua_pushcfunction(L, l_mbed_bigint_div);
   lua_setfield(L, -2, "__div");
-  lua_pushcfunction(L, eli_bigint_mod);
+  lua_pushcfunction(L, l_mbed_bigint_mod);
   lua_setfield(L, -2, "__mod");
-  lua_pushcfunction(L, eli_bigint_exp);
+  lua_pushcfunction(L, l_mbed_bigint_exp);
   lua_setfield(L, -2, "__pow");
-  lua_pushcfunction(L, eli_bigint_neg);
+  lua_pushcfunction(L, l_mbed_bigint_neg);
   lua_setfield(L, -2, "__unm");
-  lua_pushcfunction(L, eli_bigint_idiv);
+  lua_pushcfunction(L, l_mbed_bigint_idiv);
   lua_setfield(L, -2, "__idiv");
-  lua_pushcfunction(L, eli_bigint_eq);
+  lua_pushcfunction(L, l_mbed_bigint_eq);
   lua_setfield(L, -2, "__eq");
-  lua_pushcfunction(L, eli_bigint_lt);
+  lua_pushcfunction(L, l_mbed_bigint_lt);
   lua_setfield(L, -2, "__lt");
-  lua_pushcfunction(L, eli_bigint_le);
+  lua_pushcfunction(L, l_mbed_bigint_le);
   lua_setfield(L, -2, "__le");
-  lua_pushcfunction(L, eli_bigint_len);
+  lua_pushcfunction(L, l_mbed_bigint_len);
   lua_setfield(L, -2, "__len");
-  lua_pushcfunction(L, eli_bigint_tostring);
+  lua_pushcfunction(L, l_mbed_bigint_shr);
+  lua_setfield(L, -2, "__shr");
+  lua_pushcfunction(L, l_mbed_bigint_shl);
+  lua_setfield(L, -2, "__shl");
+  lua_pushcfunction(L, l_mbed_bigint_tostring);
   lua_setfield(L, -2, "__tostring");
-  lua_pushstring(L, ELI_BIGINT_METATABLE);
+  lua_pushstring(L, LUA_MBED_BIGINT_METATABLE);
   lua_setfield(L, -2, "__type");
-  lua_pushcfunction(L, eli_bigint_free);
+  lua_pushcfunction(L, l_mbed_bigint_free);
   lua_setfield(L, -2, "__gc");
 
   /* methods under __index */
   lua_newtable(L);
-  lua_pushcfunction(L, eli_bigint_add);
+  lua_pushcfunction(L, l_mbed_bigint_add);
   lua_setfield(L, -2, "add");
-  lua_pushcfunction(L, eli_bigint_sub);
+  lua_pushcfunction(L, l_mbed_bigint_sub);
   lua_setfield(L, -2, "sub");
-  lua_pushcfunction(L, eli_bigint_mul);
+  lua_pushcfunction(L, l_mbed_bigint_mul);
   lua_setfield(L, -2, "mul");
-  lua_pushcfunction(L, eli_bigint_div);
+  lua_pushcfunction(L, l_mbed_bigint_div);
   lua_setfield(L, -2, "div");
-  lua_pushcfunction(L, eli_bigint_mod);
+  lua_pushcfunction(L, l_mbed_bigint_mod);
   lua_setfield(L, -2, "mod");
-  lua_pushcfunction(L, eli_bigint_exp);
+  lua_pushcfunction(L, l_mbed_bigint_exp);
   lua_setfield(L, -2, "pow");
-  lua_pushcfunction(L, eli_bigint_neg);
+  lua_pushcfunction(L, l_mbed_bigint_neg);
   lua_setfield(L, -2, "unm");
-  lua_pushcfunction(L, eli_bigint_idiv);
+  lua_pushcfunction(L, l_mbed_bigint_idiv);
   lua_setfield(L, -2, "idiv");
-  lua_pushcfunction(L, eli_bigint_eq);
+  lua_pushcfunction(L, l_mbed_bigint_eq);
   lua_setfield(L, -2, "eq");
-  lua_pushcfunction(L, eli_bigint_lt);
+  lua_pushcfunction(L, l_mbed_bigint_lt);
   lua_setfield(L, -2, "lt");
-  lua_pushcfunction(L, eli_bigint_le);
+  lua_pushcfunction(L, l_mbed_bigint_le);
   lua_setfield(L, -2, "le");
-  lua_pushcfunction(L, eli_bigint_len);
+  lua_pushcfunction(L, l_mbed_bigint_len);
   lua_setfield(L, -2, "len");
-  lua_pushcfunction(L, eli_bigint_tostring);
+  lua_pushcfunction(L, l_mbed_bigint_shr);
+  lua_setfield(L, -2, "shr");
+  lua_pushcfunction(L, l_mbed_bigint_shl);
+  lua_setfield(L, -2, "shl");
+  lua_pushcfunction(L, l_mbed_bigint_tobinary);
+  lua_setfield(L, -2, "tobinary");
+  lua_pushcfunction(L, l_mbed_bigint_tobinary_le);
+  lua_setfield(L, -2, "tobinary_le");
+  lua_pushcfunction(L, l_mbed_bigint_tostring);
   lua_setfield(L, -2, "tostring");
-  lua_pushstring(L, ELI_BIGINT_METATABLE);
+  lua_pushstring(L, LUA_MBED_BIGINT_METATABLE);
   lua_setfield(L, -2, "__type");
 
   lua_setfield(L, -2, "__index");

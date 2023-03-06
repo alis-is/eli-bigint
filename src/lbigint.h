@@ -1,8 +1,8 @@
-#ifndef ELI_LBIGINT_H__
-#define ELI_LBIGINT_H__
+#ifndef LUA_MBED_LBIGINT_H__
+#define LUA_MBED_LBIGINT_H__
 
 #include "lua.h"
 
-int luaopen_eli_bigint(lua_State *L);
+int luaopen_l_mbed_bigint(lua_State *L);
 
 #endif
