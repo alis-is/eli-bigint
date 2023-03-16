@@ -26,21 +26,20 @@ mbedtls_mpi *new_l_mbed_bigint(lua_State *L) {
 mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
   switch (lua_type(L, index)) {
   case LUA_TNUMBER: {
-    int n = 0;
+    mbedtls_mpi *bi = new_l_mbed_bigint(L);
+    int res;
     if (lua_isinteger(L, index)) {
-      n = lua_tointeger(L, index);
+      res = mbedtls_mpi_lset(bi, lua_tointeger(L, index));
     } else {
       lua_Number d = l_floor(luaL_checknumber(L, index));
       lua_Integer li;
       if (lua_numbertointeger(d, &li)) {
-        n = (int)li;
+        res = mbedtls_mpi_lset(bi, (int)li);
       } else {
-        luaL_error(L, "cannot conver float to integer");
+        luaL_error(L, "cannot convert float to integer");
         return NULL;
       }
     }
-    mbedtls_mpi *bi = new_l_mbed_bigint(L);
-    int res = mbedtls_mpi_lset(bi, n);
     if (res != 0) {
       luaL_error(L, "error setting bigint value: %d", res);
       return NULL;
@@ -67,38 +66,19 @@ mbedtls_mpi *stack_element_to_bigint(lua_State *L, int index) {
  * Create a new bigint userdata on the stack and return it.
  */
 int l_mbed_new_bigint(lua_State *L) {
-  mbedtls_mpi *bi = new_l_mbed_bigint(L);
+  mbedtls_mpi *bi;
 
   switch (lua_type(L, 1)) {
-  case LUA_TNUMBER: {
-    int res = mbedtls_mpi_lset(bi, lua_tointeger(L, 1));
-    if (res != 0) {
-      return luaL_error(L, "error setting bigint value: %d", res);
-    }
-    break;
-  }
-  case LUA_TSTRING: {
-    int res = mbedtls_mpi_read_string(bi, 10, lua_tostring(L, 1));
-    if (res != 0) {
-      return luaL_error(L, "error setting bigint value: %d", res);
-    }
-    break;
-  }
-  case LUA_TNIL:
-    break;
-  case LUA_TUSERDATA: {
-    mbedtls_mpi *bi1 =
-        (mbedtls_mpi *)luaL_checkudata(L, 1, LUA_MBED_BIGINT_METATABLE);
-    int res = mbedtls_mpi_copy(bi, bi1);
-    if (res != 0) {
-      return luaL_error(L, "error setting bigint value: %d", res);
-    }
-    break;
-  }
+  case LUA_TNONE:
+    new_l_mbed_bigint(L);
+    return 1;
   default:
-    return luaL_typeerror(L, 1, "number or string or bigint");
+    bi = stack_element_to_bigint(L, 1);
+    if (bi == NULL) {
+      return luaL_typeerror(L, 1, "number or string or bigint");
+    }
+    return 1;
   }
-  return 1;
 }
 
 int l_mbed_bigint_add(lua_State *L) {
