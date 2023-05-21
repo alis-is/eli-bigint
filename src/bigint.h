@@ -3,7 +3,7 @@
 // #if defined(MBEDTLS_BIGNUM_C)
 #include "lua.h"
 
-#define LUA_MBED_BIGINT_METATABLE "MBED_BIGINT_METATABLE"
+#define LUA_MBED_BIGINT_METATABLE "MBED_BIGINT"
 
 int l_mbed_new_bigint(lua_State *L);
 int l_mbed_bigint_add(lua_State *L);
